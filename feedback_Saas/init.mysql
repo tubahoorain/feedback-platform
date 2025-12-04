@@ -1,0 +1,104 @@
+-- 1. Table for Company Settings
+CREATE TABLE IF NOT EXISTS company_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    company_name VARCHAR(100),
+    logo_path VARCHAR(255),
+    primary_color VARCHAR(7) DEFAULT '#4F46E5',
+    feedback_module ENUM('star', 'emoji') DEFAULT 'star',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 2. Table for Rating Parameters (e.g., Cleanliness, Staff)
+CREATE TABLE IF NOT EXISTS parameters (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Table for Customer Feedbacks (Dummy data ke liye)
+CREATE TABLE IF NOT EXISTS feedbacks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    customer_name VARCHAR(100),
+    rating INT, -- 1 to 5
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert Initial Dummy Data
+INSERT INTO company_settings (user_id, company_name, primary_color, feedback_module) VALUES (1, 'My Company', '#4F46E5', 'star');
+INSERT INTO parameters (user_id, name) VALUES (1, 'Quality'), (1, 'Service'), (1, 'Speed');
+INSERT INTO feedbacks (user_id, customer_name, rating, comment) VALUES 
+(1, 'Ali Khan', 5, 'Excellent service!'),
+(1, 'Sara Ahmed', 3, 'It was okay, could be faster.'),
+(1, 'John Doe', 1, 'Very bad experience.');
+
+
+-- 1. Database create karein (agar nahi hai)
+CREATE DATABASE IF NOT EXISTS feedback_saas;
+USE feedback_saas;
+
+-- 2. Settings Table (Admin Customization ke liye)
+CREATE TABLE IF NOT EXISTS settings (
+    id INT PRIMARY KEY DEFAULT 1,
+    company_name VARCHAR(255) DEFAULT 'Feedback SaaS',
+    primary_color VARCHAR(50) DEFAULT '#4F46E5',
+    module_type ENUM('star', 'emoji') DEFAULT 'star',
+    logo_base64 LONGTEXT, -- Image ko base64 code mein store karne ke liye
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Default setting insert karein taaki admin panel khali na dikhe
+INSERT INTO settings (id, company_name, primary_color, module_type) 
+VALUES (1, 'My Company', '#4F46E5', 'star')
+ON DUPLICATE KEY UPDATE id=1;
+
+-- 3. Parameters Table (Jo tags admin add karega)
+CREATE TABLE IF NOT EXISTS parameters (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    param_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Feedbacks Table (Customer ka data store karne ke liye)
+CREATE TABLE IF NOT EXISTS feedbacks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    rating INT NOT NULL, -- 1 se 5 tak
+    feedback_type ENUM('star', 'emoji') NOT NULL,
+    selected_tags TEXT, -- Customer ke select kiye huye tags (Comma separated: "Staff, Food")
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE users1 ADD COLUMN status VARCHAR(20) DEFAULT 'pending';
+ALTER TABLE users1 ADD COLUMN transaction_id VARCHAR(100) NULL;
+status column check karega ke admin ne approve kiya hai ya nahi ('pending' ya 'active').
+
+-- Agar feedbacks table mai company_id nahi hai to add karein
+ALTER TABLE feedbacks ADD COLUMN company_id INT;
+
+-- 1. Settings table ko naye structure par layen
+DROP TABLE IF EXISTS settings; -- Purana table hata dein
+CREATE TABLE company_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    company_name VARCHAR(255) DEFAULT 'My Company',
+    primary_color VARCHAR(20) DEFAULT '#4F46E5',
+    module_type VARCHAR(20) DEFAULT 'star',
+    logo_base64 LONGTEXT
+);
+
+-- 2. Parameters table ab company ke sath link hoga
+DROP TABLE IF EXISTS parameters; -- Purana hata dein
+CREATE TABLE feedback_parameters (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    param_name VARCHAR(100)
+);
+
+-- 3. Feedbacks table mai company_id add karein (Agar pehle nahi kiya)
+-- ALTER TABLE feedbacks ADD COLUMN company_id INT;
