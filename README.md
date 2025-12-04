@@ -101,6 +101,8 @@ git clone https://github.com/yourusername/feedback-saas.git
 <img width="1183" height="633" alt="modified_image (9)" src="https://github.com/user-attachments/assets/2d60adb7-72b9-40bf-8fb1-cada619ffd40" />
 <br><br>
 
+<img width="1910" height="925" alt="screencapture-localhost-feedback-Saas-superadmin-php-2025-12-04-16_07_34" src="https://github.com/user-attachments/assets/1110918e-0dbb-474b-ba02-9395a8114e7d" />
+
 
 
 
